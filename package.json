@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@jotai/jotai": "npm:@jsr/jotai__jotai@^2.7.0-jsr.0"
+  }
+}
