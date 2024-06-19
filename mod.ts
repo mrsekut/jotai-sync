@@ -1,4 +1,4 @@
-import { type WritableAtom, atom } from "@jotai/jotai";
+import { type WritableAtom, atom } from "jotai";
 
 export const syncAtoms = <A, B>(
 	aAtom: WritableAtom<A, [A], void>,
