@@ -1,4 +1,4 @@
-import { type WritableAtom, atom, Atom } from "jotai";
+import { type WritableAtom, atom } from "jotai";
 import { Result } from "./Result";
 import { atomFamily } from "jotai/utils";
 
@@ -10,9 +10,9 @@ export const syncAtomFamilies = <Param, A, B>(
 ): [
 	AtomFamily_<Param, A>,
 	AtomFamily_<Param, B>,
-	errorAtom: Atom<string | null>
+	errorAtom: AtomFamily_<Param, string | null>
 ] => {
-	const errorAtom = atom<string | null>(null);
+	const errorAtom = atomFamily((p: Param) => atom<string | null>(null));
 
 	const aAtom_ = atomFamily((p: Param) =>
 		atom(
@@ -22,10 +22,10 @@ export const syncAtomFamilies = <Param, A, B>(
 				if (rb.ok) {
 					set(aAtom(p), value);
 					set(bAtom(p), rb.data); // update B
-					set(errorAtom, null);
+					set(errorAtom(p), null);
 				} else {
 					set(aAtom(p), value);
-					set(errorAtom, rb.error);
+					set(errorAtom(p), rb.error);
 				}
 			}
 		)
@@ -39,10 +39,10 @@ export const syncAtomFamilies = <Param, A, B>(
 				if (ra.ok) {
 					set(bAtom(p), value);
 					set(aAtom(p), ra.data); // update A
-					set(errorAtom, null);
+					set(errorAtom(p), null);
 				} else {
 					set(bAtom(p), value);
-					set(errorAtom, ra.error);
+					set(errorAtom(p), ra.error);
 				}
 			}
 		)
