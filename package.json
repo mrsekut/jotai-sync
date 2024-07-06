@@ -1,5 +1,11 @@
 {
-	"dependencies": {
-		"jotai": "^2.8.3"
-	}
+  "dependencies": {
+    "jotai": "^2.8.3"
+  },
+  "prettier": {
+    "arrowParens": "avoid",
+    "semi": true,
+    "trailingComma": "all",
+    "singleQuote": true
+  }
 }
