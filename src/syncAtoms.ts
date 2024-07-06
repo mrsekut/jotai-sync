@@ -1,15 +1,12 @@
 import { type WritableAtom, atom, Atom } from "jotai";
+import { Result } from "./Result";
 
 export const syncAtoms = <A, B>(
-	aAtom: WritableAtom<A, [A], void>,
-	bAtom: WritableAtom<B, [B], void>,
+	aAtom: WritableAtom_<A>,
+	bAtom: WritableAtom_<B>,
 	a2b: (a: A) => Result<B>,
 	b2a: (b: B) => Result<A>
-): [
-	WritableAtom<A, [A], void>,
-	WritableAtom<B, [B], void>,
-	errorAtom: Atom<string | null>
-] => {
+): [WritableAtom_<A>, WritableAtom_<B>, errorAtom: Atom<string | null>] => {
 	const errorAtom = atom<string | null>(null);
 
 	const aAtom_ = atom(
@@ -45,6 +42,4 @@ export const syncAtoms = <A, B>(
 	return [aAtom_, bAtom_, errorAtom];
 };
 
-type Result<T> = { ok: true; data: T } | { ok: false; error: string | null };
-export const ok = <T>(v: T) => ({ ok: true, data: v } as const);
-export const ng = (v: string | null) => ({ ok: false, error: v } as const);
+type WritableAtom_<A> = WritableAtom<A, [A], void>;

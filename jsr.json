@@ -1,5 +1,5 @@
 {
 	"name": "@mrsekut/jotai-sync",
 	"version": "0.1.2",
-	"exports": "./mod.ts"
+	"exports": "./src/index.ts"
 }
