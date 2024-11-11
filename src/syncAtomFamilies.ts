@@ -2,6 +2,17 @@ import { type WritableAtom, atom } from 'jotai';
 import { Result } from './Result';
 import { atomFamily } from 'jotai/utils';
 
+/**
+ * Synchronizes two atom families, ensuring that changes in one atom family
+ * are reflected in the other. This function provides synchronized versions of
+ * the original atoms for each family parameter and an error atom to capture any conversion errors.
+ *
+ * @param aAtom - Function to create the first atom family member based on a parameter
+ * @param bAtom - Function to create the second atom family member based on a parameter
+ * @param a2b - Function to convert from type A to type B, returning a Result type
+ * @param b2a - Function to convert from type B to type A, returning a Result type
+ * @returns A tuple with synchronized atom families for aAtom and bAtom, and an error atom family
+ */
 export const syncAtomFamilies = <Param, A, B>(
   aAtom: (p: Param) => WritableAtom_<A>,
   bAtom: (p: Param) => WritableAtom_<B>,

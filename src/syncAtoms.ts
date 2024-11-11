@@ -1,6 +1,17 @@
 import { type WritableAtom, atom, Atom } from 'jotai';
 import { Result } from './Result';
 
+/**
+ * Synchronizes two Jotai atoms by ensuring changes in one atom are reflected in the other atom.
+ * Conversion functions (a2b and b2a) are used to transform values between the two atoms' types,
+ * and an errorAtom is provided to handle any conversion errors.
+ *
+ * @param aAtom - The first atom to synchronize
+ * @param bAtom - The second atom to synchronize
+ * @param a2b - Function to convert from A to B, returning a Result type
+ * @param b2a - Function to convert from B to A, returning a Result type
+ * @returns A tuple with synchronized versions of aAtom and bAtom, and an errorAtom to capture any errors
+ */
 export const syncAtoms = <A, B>(
   aAtom: WritableAtom_<A>,
   bAtom: WritableAtom_<B>,
