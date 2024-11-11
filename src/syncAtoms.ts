@@ -1,4 +1,4 @@
-import { type WritableAtom, atom, Atom } from 'jotai';
+import { atom, Atom, PrimitiveAtom, SetStateAction } from 'jotai';
 import { Result } from './Result';
 
 /**
@@ -13,23 +13,25 @@ import { Result } from './Result';
  * @returns A tuple with synchronized versions of aAtom and bAtom, and an errorAtom to capture any errors
  */
 export const syncAtoms = <A, B>(
-  aAtom: WritableAtom_<A>,
-  bAtom: WritableAtom_<B>,
+  aAtom: PrimitiveAtom<A>,
+  bAtom: PrimitiveAtom<B>,
   a2b: (a: A) => Result<B>,
   b2a: (b: B) => Result<A>,
-): [WritableAtom_<A>, WritableAtom_<B>, errorAtom: Atom<string | null>] => {
+): [PrimitiveAtom<A>, PrimitiveAtom<B>, errorAtom: Atom<string | null>] => {
   const errorAtom = atom<string | null>(null);
 
   const aAtom_ = atom(
     get => get(aAtom),
-    (_get, set, value: A) => {
+    (get, set, update: SetStateAction<A>) => {
+      const a = get(aAtom);
+      const value = isFunction(update) ? (update as (prev: A) => A)(a) : update;
       const rb = a2b(value);
       if (rb.ok) {
-        set(aAtom, value);
+        set(aAtom, update);
         set(bAtom, rb.data); // update B
         set(errorAtom, null);
       } else {
-        set(aAtom, value);
+        set(aAtom, update);
         set(errorAtom, rb.error);
       }
     },
@@ -37,7 +39,9 @@ export const syncAtoms = <A, B>(
 
   const bAtom_ = atom(
     get => get(bAtom),
-    (_get, set, value: B) => {
+    (get, set, update: SetStateAction<B>) => {
+      const b = get(bAtom);
+      const value = isFunction(update) ? (update as (prev: B) => B)(b) : update;
       const ra = b2a(value);
       if (ra.ok) {
         set(bAtom, value);
@@ -53,4 +57,4 @@ export const syncAtoms = <A, B>(
   return [aAtom_, bAtom_, errorAtom];
 };
 
-type WritableAtom_<A> = WritableAtom<A, [A], void>;
+const isFunction = <T>(x: T) => typeof x === 'function';
