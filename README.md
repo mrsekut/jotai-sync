@@ -7,7 +7,7 @@
 ## Installation
 
 ```
-$ npm install @mrsekut/jotai-sync
+$ npx jsr add @mrsekut/jotai-sync
 ```
 
 ## Usage
