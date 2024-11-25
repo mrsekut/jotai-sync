@@ -1,11 +1,17 @@
 {
-  "dependencies": {
-    "jotai": "^2.8.3"
+  "scripts": {
+    "tsc": "node_modules/typescript/bin/tsc -p tsconfig.json"
   },
   "prettier": {
     "arrowParens": "avoid",
     "semi": true,
     "trailingComma": "all",
     "singleQuote": true
+  },
+  "dependencies": {
+    "jotai": "^2.8.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
   }
 }
