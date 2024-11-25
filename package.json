@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "tsc": "node_modules/typescript/bin/tsc -p tsconfig.json"
+    "tsc": "node_modules/typescript/bin/tsc -p tsconfig.json",
+    "test": "vitest --typecheck"
   },
   "prettier": {
     "arrowParens": "avoid",
@@ -12,6 +13,7 @@
     "jotai": "^2.8.3"
   },
   "devDependencies": {
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.5"
   }
 }

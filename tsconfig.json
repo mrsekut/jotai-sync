@@ -5,6 +5,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "types": ["vitest/importMeta"],
     "strictNullChecks": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
