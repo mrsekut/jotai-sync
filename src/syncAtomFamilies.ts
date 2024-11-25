@@ -1,4 +1,4 @@
-import { PrimitiveAtom, SetStateAction, atom } from 'jotai';
+import { SetStateAction, WritableAtom, atom, useSetAtom } from 'jotai';
 import { Result } from './Result';
 import { atomFamily } from 'jotai/utils';
 
@@ -14,8 +14,8 @@ import { atomFamily } from 'jotai/utils';
  * @returns A tuple with synchronized atom families for aAtom and bAtom, and an error atom family
  */
 export const syncAtomFamilies = <Param, A, B>(
-  aAtom: (p: Param) => PrimitiveAtom<A>,
-  bAtom: (p: Param) => PrimitiveAtom<B>,
+  aAtom: (p: Param) => WritableAtom_<A>,
+  bAtom: (p: Param) => WritableAtom_<B>,
   a2b: (a: A) => Result<B>,
   b2a: (b: B) => Result<A>,
 ): [
@@ -70,7 +70,8 @@ export const syncAtomFamilies = <Param, A, B>(
   return [aAtom_, bAtom_, errorAtom];
 };
 
-type AtomFamily_<Param, T> = AtomFamily<Param, PrimitiveAtom<T>>;
+type AtomFamily_<Param, T> = AtomFamily<Param, WritableAtom_<T>>;
+type WritableAtom_<A> = WritableAtom<A, [A], void>;
 
 interface AtomFamily<Param, AtomType> {
   (param: Param): AtomType;
@@ -80,3 +81,52 @@ interface AtomFamily<Param, AtomType> {
 type ShouldRemove<Param> = (createdAt: number, param: Param) => boolean;
 
 const isFunction = <T>(x: T) => typeof x === 'function';
+
+if (import.meta.vitest) {
+  const { test, expectTypeOf } = import.meta.vitest;
+
+  type Key = string;
+  const anyF = (v: any) => v as any;
+
+  test('No type error when an atom is passed as an argument', () => {
+    const aAtom = atomFamily((_: Key) => atom(0));
+    const bAtom = atomFamily((_: Key) => atom('0'));
+    type SyncAtomFamilies = typeof syncAtomFamilies<Key, number, string>;
+
+    expectTypeOf<SyncAtomFamilies>().toBeCallableWith(aAtom, bAtom, anyF, anyF);
+  });
+
+  test('No type error when a derived atom is passed as an argument', () => {
+    const xAtom = atom(0);
+    const _aAtom = atomFamily((_: Key) =>
+      atom(
+        get => get(xAtom),
+        (_get, set, update: number) => set(xAtom, update),
+      ),
+    );
+    const _bAtom = atomFamily((_: Key) => atom('0'));
+
+    type SyncAtomFamilies = typeof syncAtomFamilies<Key, number, string>;
+
+    expectTypeOf<SyncAtomFamilies>().toBeCallableWith(
+      _aAtom,
+      _bAtom,
+      anyF,
+      anyF,
+    );
+  });
+
+  test('Return value works with setter accepting a function', () => {
+    const _aAtom = atomFamily((_: Key) => atom(0));
+    const _bAtom = atomFamily((_: Key) => atom('0'));
+    const [aAtom] = syncAtomFamilies(_aAtom, _bAtom, anyF, anyF);
+
+    // useSetAtom can only be called within React context, so we emulate the type
+    const useSetAtom_: typeof useSetAtom = (() => {}) as any;
+    const setA = useSetAtom_(aAtom('key'));
+    type SetA = typeof setA;
+
+    expectTypeOf<SetA>().toBeCallableWith(1);
+    expectTypeOf<SetA>().toBeCallableWith(p => p + 1);
+  });
+}
